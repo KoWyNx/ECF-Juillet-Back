@@ -1,0 +1,6 @@
+@ECF_HostAddress = http://localhost:5047
+
+GET {{ECF_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
