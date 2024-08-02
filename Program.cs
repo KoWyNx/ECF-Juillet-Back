@@ -1,4 +1,12 @@
+using ECF.Context;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<MyDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection"));
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();

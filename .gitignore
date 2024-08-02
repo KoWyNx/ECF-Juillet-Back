@@ -3,3 +3,10 @@
 ################################################################################
 
 /.vs/ECF/FileContentIndex
+/bin/Debug/net8.0
+/obj/ECF.csproj.EntityFrameworkCore.targets
+/obj/ECF.csproj.nuget.dgspec.json
+/obj/ECF.csproj.nuget.g.props
+/obj/ECF.csproj.nuget.g.targets
+/obj/project.assets.json
+/obj/project.nuget.cache
