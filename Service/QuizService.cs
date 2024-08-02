@@ -1,6 +1,7 @@
 ﻿using ECF.Context;
 using ECF.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ECF.Service
@@ -21,18 +22,34 @@ namespace ECF.Service
                 .FirstOrDefaultAsync(q => q.QuestionId == questionId);
         }
 
-        public async Task<Question?> GetRandomQuestionAsync()
+        public async Task<IEnumerable<Question>> GetAllQuestionsAsync()
         {
             return await _context.Questions
                 .Include(q => q.QuestionOptions)
-                .OrderBy(q => Guid.NewGuid())  
-                .FirstOrDefaultAsync();
+                .ToListAsync();
         }
 
-        public async Task AddPlayerScoreAsync(PlayerScore playerScore)
+        public async Task<bool> EvaluateAnswerAsync(int questionId, string givenAnswer)
+        {
+            var question = await GetQuestionByIdAsync(questionId);
+            if (question != null)
+            {
+                return question.CorrectAnswer.Equals(givenAnswer, StringComparison.OrdinalIgnoreCase);
+            }
+            return false;
+        }
+
+        public async Task SubmitPlayerScoreAsync(PlayerScore playerScore)
         {
             _context.PlayerScores.Add(playerScore);
             await _context.SaveChangesAsync();
         }
+
+
+        public async Task<List<PlayerScore>> GetPlayerScoresAsync()
+        {
+            return await _context.PlayerScores.ToListAsync();
+        }
+
     }
 }

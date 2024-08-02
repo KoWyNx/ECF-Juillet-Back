@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace ECF.Models;
 
@@ -12,6 +11,5 @@ public partial class QuestionOption
 
     public string OptionText { get; set; } = null!;
 
-    [JsonIgnore]
     public virtual Question? Question { get; set; }
 }

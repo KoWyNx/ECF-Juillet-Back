@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace ECF.Models;
 
@@ -12,6 +11,7 @@ public partial class Question
 
     public string CorrectAnswer { get; set; } = null!;
 
-    [JsonIgnore]
+    public int? Level { get; set; }
+
     public virtual ICollection<QuestionOption> QuestionOptions { get; set; } = new List<QuestionOption>();
 }

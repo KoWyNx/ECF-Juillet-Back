@@ -4,14 +4,28 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure services
+// Ajoutez la configuration CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000") // URL de votre front-end React
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
+
+// Configurez DbContext
 builder.Services.AddDbContext<MyDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyDbConnection"));
 });
 
+// Ajoutez les services
 builder.Services.AddScoped<IQuizService, QuizService>();
 
+// Configurez les contrôleurs et la sérialisation JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -19,6 +33,9 @@ builder.Services.AddControllers()
     });
 
 var app = builder.Build();
+
+// Utilisez CORS
+app.UseCors("AllowReactApp");
 
 if (!app.Environment.IsDevelopment())
 {
@@ -31,6 +48,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
-app.MapControllers(); 
+app.MapControllers();
 
 app.Run();

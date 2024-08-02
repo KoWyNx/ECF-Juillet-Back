@@ -1,6 +1,7 @@
 ﻿using ECF.Models;
 using ECF.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ECF.Controller
 {
@@ -15,39 +16,77 @@ namespace ECF.Controller
             _quizService = quizService;
         }
 
+        [HttpGet("questions")]
+        public async Task<IActionResult> GetAllQuestions()
+        {
+            var questions = await _quizService.GetAllQuestionsAsync();
+            if (questions == null) return NotFound();
+
+            var response = questions.Select(q => new
+            {
+                q.QuestionId,
+                q.Text,
+                q.CorrectAnswer,
+                QuestionOptions = q.QuestionOptions.Select(o => new
+                {
+                    o.OptionId,
+                    o.OptionText
+                }).ToList()
+            }).ToList();
+
+            return Ok(response);
+        }
+
         [HttpGet("questions/{questionId}")]
         public async Task<IActionResult> GetQuestionById(int questionId)
         {
             var question = await _quizService.GetQuestionByIdAsync(questionId);
+            if (question == null) return NotFound();
 
-            if (question == null)
-                return NotFound();
+            var response = new
+            {
+                question.QuestionId,
+                question.Text,
+                question.CorrectAnswer,
+                QuestionOptions = question.QuestionOptions.Select(o => new
+                {
+                    o.OptionId,
+                    o.OptionText
+                }).ToList()
+            };
 
-            return Ok(question);
-        }
-
-        [HttpGet("questions/random")]
-        public async Task<IActionResult> GetRandomQuestion()
-        {
-            var question = await _quizService.GetRandomQuestionAsync();
-
-            if (question == null)
-                return NotFound();
-
-            return Ok(question);
+            return Ok(response);
         }
 
         [HttpPost("player-score")]
-        public async Task<IActionResult> PostPlayerScore([FromBody] PlayerScore playerScore)
+        public async Task<IActionResult> SubmitPlayerScore([FromBody] PlayerScore score)
         {
-            await _quizService.AddPlayerScoreAsync(playerScore);
-            return CreatedAtAction(nameof(PostPlayerScore), new { id = playerScore.ScoreId }, playerScore);
+            try
+            {
+                await _quizService.SubmitPlayerScoreAsync(score);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error. Could not submit player score.");
+            }
         }
 
-        [HttpGet("test")]
-        public IActionResult TestEndpoint()
+
+        [HttpGet("player-scores")]
+        public async Task<IActionResult> GetPlayerScores()
         {
-            return Ok(new { Message = "API is working correctly!" });
+            var scores = await _quizService.GetPlayerScoresAsync();
+            if (scores == null) return NotFound();
+
+            var response = scores.Select(s => new
+            {
+                s.PlayerName,
+                s.Score
+            }).ToList();
+
+            return Ok(response);
         }
+
     }
 }
