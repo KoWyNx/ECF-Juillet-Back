@@ -71,22 +71,27 @@ namespace ECF.Controller
                 return StatusCode(500, "Internal server error. Could not submit player score.");
             }
         }
-
-
         [HttpGet("player-scores")]
         public async Task<IActionResult> GetPlayerScores()
         {
-            var scores = await _quizService.GetPlayerScoresAsync();
-            if (scores == null) return NotFound();
-
-            var response = scores.Select(s => new
+            try
             {
-                s.PlayerName,
-                s.Score
-            }).ToList();
+                var scores = await _quizService.GetPlayerScoresAsync();
+                if (scores == null || !scores.Any())
+                {
+                    return NotFound("No player scores found");
+                }
 
-            return Ok(response);
+                return Ok(scores);
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                Console.Error.WriteLine(ex.Message);
+                return StatusCode(500, "Internal server error");
+            }
         }
+
 
     }
 }
